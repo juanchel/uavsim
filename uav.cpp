@@ -9,7 +9,7 @@
 
 static int counter = -1; // Counter for storing the tail
 static int colorNumber = 0; // The tracker of colors already used for uavs
-static int nextId = 0;
+static int nextId = 0; // The id to assign to the next uav
 
 float uavColors[MAX_COLORS][3] = {
     {1, 0, 0},{0, 1, 0},{0, 0, 1},{1, 1, 0},{1, 0, 1},{0, 1, 1},
@@ -21,7 +21,7 @@ float uavColors[MAX_COLORS][3] = {
 };
 
 UAV::UAV(double x, double y, double d) :
-direction(d), active(true), curWaypoint(x,y), coor(x,y)
+direction(d), active(true), curWaypoint(x,y), coor(x,y), idno(nextId)
 {
     color[0] = uavColors[colorNumber][0];
     color[1] = uavColors[colorNumber][1];
@@ -32,7 +32,7 @@ direction(d), active(true), curWaypoint(x,y), coor(x,y)
     if (colorNumber >= MAX_COLORS)
         colorNumber = 0;
     
-    //waypoints.push_back(Coordinate(rand()%400 - 200,rand()%400 - 200));
+    waypoints.push_back(Coordinate(rand()%400 - 200,rand()%400 - 200));
 }
 
 void UAV::step(double turn)
@@ -66,7 +66,7 @@ void UAV::nextWaypoint()
         curWaypoint.y = waypoints.front().y;
         waypoints.pop_front();
         
-        //waypoints.push_back(Coordinate(rand()%400 - 200,rand()%400 - 200));
+        waypoints.push_back(Coordinate(rand()%400 - 200,rand()%400 - 200));
     }
     else
     {

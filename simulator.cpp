@@ -13,6 +13,17 @@ double distance(Coordinate a, Coordinate b)
     return sqrt(pow(a.x - b.x,2) + pow(a.y - b.y,2));
 }
 
+double dotProduct(Coordinate a, Coordinate b)
+{
+    return a.x*b.x + b.y*b.y;
+}
+
+double angleTo(Coordinate a, Coordinate b)
+{
+    double ret = atan2(b.y-a.y, b.x-a.x)*57.295779513;
+    return (ret<0) ? ret+360 : ret;
+}
+
 Simulator::Simulator() {}
 
 bool Simulator::step()
@@ -26,13 +37,8 @@ bool Simulator::step()
         {
             if (!avoid(&u))
             {
-                // Calculate the angle between the uav and waypoint
-                double deltaX = u.curWaypoint.x - u.coor.x;
-                double deltaY = u.curWaypoint.y - u.coor.y;
-                double toWaypoint = atan2(deltaY, deltaX)*57.295779513;
-                
-                if (toWaypoint < 0)
-                    toWaypoint+=360;
+                // Calculate the angle between the uav and waypoint    
+                double toWaypoint = angleTo(u.coor, u.curWaypoint);
                 
                 // Calculate the amount to turn
                 double turn = fabs((double)toWaypoint - u.direction);

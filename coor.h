@@ -10,6 +10,8 @@ public:
     
     Coordinate();
     Coordinate(double x, double y);
+    Coordinate operator+(const Coordinate& other);
+    Coordinate operator-(const Coordinate& other);
 };
 
 #endif

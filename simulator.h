@@ -19,6 +19,8 @@ struct event {
 enum eventType {EVENT_REACHED_WAYPOINT, EVENT_NEAR_MISS};
 
 double distance(Coordinate a, Coordinate b); // Calcuates the distance between two points
+double dotProduct(Coordinate a, Coordinate b); // Calculates the dot product of two points
+double angleTo(Coordinate a, Coordinate b); // Calculates the angle from a to b
 
 class Simulator
 {
