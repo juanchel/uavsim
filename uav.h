@@ -8,11 +8,11 @@
 #include <list>
 #include <vector>
 #include "coor.h"
-#define MAX_TURN 2.25
+#define MAX_TURN 2
 #define MAX_SPEED 1
 #define MAX_COLORS 32
-#define TAIL_RESOLUTION 12
-#define TAIL_SIZE 24
+#define TAIL_RESOLUTION 8
+#define TAIL_SIZE 8
 
 class UAV
 {
@@ -25,9 +25,11 @@ public:
     double direction; // The bearing, in degrees, of the uav
     bool active; // Whether the uav is active
     int idno; // The ID number of the uav
+    double order; // The amount the uav is ordered to turn
     
     UAV(double x, double y, double d);
-    void step(double t); // Take a step of time, turning t degrees
+    void step(); // Take a step of time, turning t degrees
+    void giveOrder(double t); // Order the uav to turn t degrees the next step;
     void nextWaypoint(); // Tells the uav to make the next waypoint active
     
     bool getActive(); // Returns whether or not the uav is active

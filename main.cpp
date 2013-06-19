@@ -64,7 +64,7 @@ int readCourse (char* filename, Simulator* sim)
         int id;
         double x;
         double y;
-        double temp;
+        double dir;
         
         int found = 0;
         
@@ -76,7 +76,7 @@ int readCourse (char* filename, Simulator* sim)
         {
             if (buffer[0] >= 48 && buffer[0] < 58)
             {
-                sscanf(buffer, "%d %lf %lf %lf", &id, &x, &y, &temp);
+                sscanf(buffer, "%d %lf %lf %lf", &id, &x, &y, &dir);
                 
                 /* If the course file is in latitude and longitude, convert it to meters
                  It is most accurate for course files that have latitiudes around 32-33 */
@@ -93,9 +93,6 @@ int readCourse (char* filename, Simulator* sim)
                     
                     x-=baseLng;
                     x*=110895.58;
-                    
-                    //x = lngToX(x, baseLng);
-                    //y = latToY(y, baseLat);
                 }
                 
                 // Match the course id to the simulation id
@@ -109,7 +106,7 @@ int readCourse (char* filename, Simulator* sim)
                 // The the uav is not found in the simulation, create it, otherwise, add the waypoint
                 if (found == -1)
                 {
-                    sim->uavs.push_back(UAV(x, y, 90));
+                    sim->uavs.push_back(UAV(x, y, dir));
                     courseID.push_back(id);
                 }
                 else
@@ -117,8 +114,19 @@ int readCourse (char* filename, Simulator* sim)
                     sim->uavs[found].waypoints.push_back(Coordinate(x, y));
                 }
             }
+            else if (buffer[0] == '-')
+            {
+                if (buffer[1] == 'm')
+                    latLng = false;
+                else if (buffer[1] == 'l')
+                    latLng = true;
+            }
+            else if (buffer[0] == '=' && buffer[1] == '=')
+            {
+                break;
+            }
         }
-        
+        fclose(file);
         return 1;
     }
     
@@ -339,7 +347,7 @@ int main(int argc, char** argv) {
     
     readCourse((char*)"test.txt", &sim);
     
-    sim.initDistances();
+    sim.init(visualize);
     
     if (visualize)
     {

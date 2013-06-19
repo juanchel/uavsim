@@ -15,7 +15,7 @@ double distance(Coordinate a, Coordinate b)
 
 double dotProduct(Coordinate a, Coordinate b)
 {
-    return a.x*b.x + b.y*b.y;
+    return (double)a.x*b.x + a.y*b.y;
 }
 
 double angleTo(Coordinate a, Coordinate b)
@@ -31,6 +31,7 @@ bool Simulator::step()
     UAV::incrementCounter();
     time++;
     
+    std::cout << std::endl;
     for (UAV &u : uavs)
     {
         if (u.active)
@@ -69,22 +70,22 @@ bool Simulator::step()
                 if (u.direction < 180)
                 {
                     if (toWaypoint > u.direction && toWaypoint < u.direction+180)
-                        u.step(turn);
+                        u.giveOrder(turn);
                     else
-                        u.step(-1*turn);
+                        u.giveOrder(-1*turn);
                 }
                 else
                 {
                     if (toWaypoint < u.direction && toWaypoint > u.direction-180)
-                        u.step(-1*turn);
+                        u.giveOrder(-1*turn);
                     else
-                        u.step(turn);
+                        u.giveOrder(turn);
                 }
             }
             
             if (distance(u.coor, u.curWaypoint) < WAYPOINT_SIZE)
             {
-                if (time > 2)
+                if (time > 2 && visualize)
                 {
                     event temp;
                     temp.coor = Coordinate(u.curWaypoint.x, u.curWaypoint.y);
@@ -97,9 +98,10 @@ bool Simulator::step()
         }
     }
     
-    // Calculate near misses
+    // Execute the orders and calculate near misses
     for (UAV &u : uavs)
     {
+        u.step();
         for (UAV &v : uavs)
         {
             if (&u==&v)
@@ -108,7 +110,7 @@ bool Simulator::step()
             u.distToUAV[v.idno] = distance(u.coor, v.coor);
             v.distToUAV[u.idno] = u.distToUAV[v.idno];
             
-            if (u.distToUAV[v.idno] < NEAR_MISS_SIZE)
+            if (u.distToUAV[v.idno] < NEAR_MISS_SIZE && visualize)
             {
                 event temp;
                 temp.coor = Coordinate((u.coor.x + v.coor.x)/2, (u.coor.y + v.coor.y)/2);
@@ -137,8 +139,9 @@ bool Simulator::avoid(UAV *u)
     return inverseprop(u);
 }
 
-void Simulator::initDistances()
+void Simulator::init(bool v)
 {
+    visualize = v;
     for (UAV &u : uavs)
     {
         u.distToUAV.resize(uavs.size());
